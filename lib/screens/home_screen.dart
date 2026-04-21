@@ -2,6 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:learn_english/screens/settings_screen.dart';
 import 'quiz_screen.dart';
 
+final List<Map<String, dynamic>> levels = [
+  {
+    "title": "Elementary 1",
+    "subtitle": "Basic grammar & vocabulary",
+    "level": "elementary1",
+    "icon": Icons.book,
+    "color": Colors.green,
+  },
+  {
+    "title": "Elementary 2",
+    "subtitle": "Simple sentences",
+    "level": "elementary2",
+    "icon": Icons.menu_book,
+    "color": Colors.blue,
+  },
+  {
+    "title": "Pre-Intermediate",
+    "subtitle": "Daily conversations",
+    "level": "pre intermediate",
+    "icon": Icons.chat,
+    "color": Colors.orange,
+  },
+  {
+    "title": "Intermediate",
+    "subtitle": "Advanced grammar",
+    "level": "intermediate",
+    "icon": Icons.school,
+    "color": Colors.purple,
+  },
+];
+
 class HomeScreen extends StatelessWidget {
   final bool isDarkMode;
   final Function(bool) onThemeChanged;
@@ -20,72 +51,57 @@ class HomeScreen extends StatelessWidget {
     required IconData icon,
     required Color color,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => QuizScreen(level: level)),
-          );
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [color.withOpacity(0.8), color],
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => QuizScreen(level: level)),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [color.withOpacity(0.8), color]),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: Colors.white,
+              child: Icon(icon, color: color, size: 30),
             ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          padding: const EdgeInsets.all(18),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.white,
-                child: Icon(icon, color: color, size: 30),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.arrow_forward_ios,
+            const SizedBox(height: 12),
+
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
                 color: Colors.white,
-                size: 18,
               ),
-            ],
-          ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, color: Colors.white70),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Text(
-        "Choose your level to start learning",
-        style: TextStyle(
-          color: Theme.of(context).textTheme.bodyMedium?.color,
-        ),
-      ),
+    return Text(
+      "Choose your level to start learning",
+      style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
     );
   }
 
@@ -146,9 +162,7 @@ class HomeScreen extends StatelessWidget {
                 context: context,
                 applicationName: "Learn English",
                 applicationVersion: "1.0.0",
-                children: const [
-                  Text("Simple English learning quiz app."),
-                ],
+                children: const [Text("Simple English learning quiz app.")],
               );
             },
           ),
@@ -162,58 +176,34 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       drawer: buildDrawer(context),
 
-      appBar: AppBar(
-        title: const Text("Learn English"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("Learn English"), centerTitle: true),
 
       // 🎨 Dynamic background
-      backgroundColor: isDarkMode
-          ? const Color(0xFF0D1117)
-          : Colors.grey[100],
+      backgroundColor: isDarkMode ? const Color(0xFF0D1117) : Colors.grey[100],
+      body: GridView.builder(
+        padding: const EdgeInsets.all(16),
 
-      body: ListView(
-        children: [
-          buildHeader(context),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 300, // max width per card
+          mainAxisExtent: 180, // height of each card
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+        ),
 
-          buildLevelCard(
+        itemCount: levels.length,
+
+        itemBuilder: (context, index) {
+          final item = levels[index];
+
+          return buildLevelCard(
             context: context,
-            title: "Elementary 1",
-            subtitle: "Basic grammar & vocabulary",
-            level: "elementary1",
-            icon: Icons.book,
-            color: Colors.green,
-          ),
-
-          buildLevelCard(
-            context: context,
-            title: "Elementary 2",
-            subtitle: "Simple sentences",
-            level: "elementary2",
-            icon: Icons.menu_book,
-            color: Colors.blue,
-          ),
-
-          buildLevelCard(
-            context: context,
-            title: "Pre-Intermediate",
-            subtitle: "Daily conversations",
-            level: "pre intermediate",
-            icon: Icons.chat,
-            color: Colors.orange,
-          ),
-
-          buildLevelCard(
-            context: context,
-            title: "Intermediate",
-            subtitle: "Advanced grammar",
-            level: "intermediate",
-            icon: Icons.school,
-            color: Colors.purple,
-          ),
-
-          const SizedBox(height: 20),
-        ],
+            title: item["title"],
+            subtitle: item["subtitle"],
+            level: item["level"],
+            icon: item["icon"],
+            color: item["color"],
+          );
+        },
       ),
     );
   }
