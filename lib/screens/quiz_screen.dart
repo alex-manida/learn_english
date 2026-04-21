@@ -7,6 +7,7 @@ import '../data/intermediate.dart';
 import '../data/pre_intermediate.dart';
 import '../models/question.dart';
 import '../widgets/option_button.dart';
+import 'dart:async';
 
 class QuizScreen extends StatefulWidget {
   final String level;
@@ -33,6 +34,12 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
 
@@ -45,9 +52,33 @@ class _QuizScreenState extends State<QuizScreen> {
     } else {
       questions = interQ;
     }
+
+    startTimer(); // ✅ start timer
+  }
+
+  int timeLeft = 60;
+  Timer? timer;
+
+  void startTimer() {
+    timer?.cancel(); // stop old timer
+
+    timeLeft = 60;
+
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (timeLeft > 0) {
+        setState(() {
+          timeLeft--;
+        });
+      } else {
+        t.cancel();
+        nextQuestion(); // auto move when time ends
+      }
+    });
   }
 
   void nextQuestion() {
+    timer?.cancel(); // stop timer first
+
     if (selectedIndex == questions[index].correctIndex) {
       score++;
     }
@@ -57,6 +88,8 @@ class _QuizScreenState extends State<QuizScreen> {
         index++;
         selectedIndex = null;
       });
+
+      startTimer(); // ✅ restart timer
     } else {
       Navigator.pushReplacement(
         context,
@@ -94,10 +127,13 @@ class _QuizScreenState extends State<QuizScreen> {
                     ),
                   ),
                   Row(
-                    children: const [
-                      Icon(Icons.timer, color: Colors.yellow),
-                      SizedBox(width: 5),
-                      Text("53 s", style: TextStyle(color: Colors.white)),
+                    children: [
+                      const Icon(Icons.timer, color: Colors.yellow),
+                      const SizedBox(width: 5),
+                      Text(
+                        "$timeLeft s",
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ],
                   ),
                 ],
@@ -166,33 +202,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     ),
                   ),
                   onPressed: selectedIndex == null ? null : nextQuestion,
-                  child: ElevatedButton(
-                    onPressed: selectedIndex == null
-                        ? null
-                        : () {
-                            if (selectedIndex == q.correctIndex) {
-                              score++;
-                            }
-
-                            if (index < questions.length - 1) {
-                              setState(() {
-                                index++;
-                                selectedIndex = null;
-                              });
-                            } else {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ResultScreen(
-                                    score: score,
-                                    total: questions.length,
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                    child: const Text("Next Question"),
-                  ),
+                  child: const Text("Next Question"),
                 ),
               ),
             ],
