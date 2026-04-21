@@ -25,19 +25,8 @@ class _QuizScreenState extends State<QuizScreen> {
   int score = 0;
   int? selectedIndex;
 
-  void selectAnswer(int i) {
-    if (selectedIndex == null) {
-      setState(() {
-        selectedIndex = i;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
+  int timeLeft = 60;
+  Timer? timer;
 
   @override
   void initState() {
@@ -53,15 +42,25 @@ class _QuizScreenState extends State<QuizScreen> {
       questions = interQ;
     }
 
-    startTimer(); // ✅ start timer
+    startTimer();
   }
 
-  int timeLeft = 60;
-  Timer? timer;
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  void selectAnswer(int i) {
+    if (selectedIndex == null) {
+      setState(() {
+        selectedIndex = i;
+      });
+    }
+  }
 
   void startTimer() {
-    timer?.cancel(); // stop old timer
-
+    timer?.cancel();
     timeLeft = 60;
 
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -71,13 +70,13 @@ class _QuizScreenState extends State<QuizScreen> {
         });
       } else {
         t.cancel();
-        nextQuestion(); // auto move when time ends
+        nextQuestion();
       }
     });
   }
 
   void nextQuestion() {
-    timer?.cancel(); // stop timer first
+    timer?.cancel();
 
     if (selectedIndex == questions[index].correctIndex) {
       score++;
@@ -88,13 +87,13 @@ class _QuizScreenState extends State<QuizScreen> {
         index++;
         selectedIndex = null;
       });
-
-      startTimer(); // ✅ restart timer
+      startTimer();
     } else {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => ResultScreen(score: score, total: questions.length),
+          builder: (_) =>
+              ResultScreen(score: score, total: questions.length),
         ),
       );
     }
@@ -103,9 +102,10 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     var q = questions[index];
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -117,22 +117,25 @@ class _QuizScreenState extends State<QuizScreen> {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    icon: Icon(Icons.arrow_back,
+                        color: theme.iconTheme.color),
                   ),
-                  const Text(
+                  Text(
                     "Module 1",
                     style: TextStyle(
-                      color: Colors.orange,
+                      color: theme.colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.timer, color: Colors.yellow),
+                      const Icon(Icons.timer, color: Colors.orange),
                       const SizedBox(width: 5),
                       Text(
                         "$timeLeft s",
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: theme.textTheme.bodyMedium?.color,
+                        ),
                       ),
                     ],
                   ),
@@ -146,7 +149,9 @@ class _QuizScreenState extends State<QuizScreen> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Question ${index + 1} of ${questions.length}",
-                  style: const TextStyle(color: Colors.blueAccent),
+                  style: TextStyle(
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
 
@@ -154,8 +159,8 @@ class _QuizScreenState extends State<QuizScreen> {
 
               LinearProgressIndicator(
                 value: (index + 1) / questions.length,
-                color: Colors.orange,
-                backgroundColor: Colors.grey.shade800,
+                color: theme.colorScheme.primary,
+                backgroundColor: theme.dividerColor,
               ),
 
               const SizedBox(height: 30),
@@ -164,10 +169,10 @@ class _QuizScreenState extends State<QuizScreen> {
               Text(
                 q.question,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
+                  color: theme.textTheme.bodyLarge?.color,
                 ),
               ),
 
@@ -194,14 +199,8 @@ class _QuizScreenState extends State<QuizScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    padding: const EdgeInsets.all(16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  onPressed: selectedIndex == null ? null : nextQuestion,
+                  onPressed:
+                  selectedIndex == null ? null : nextQuestion,
                   child: const Text("Next Question"),
                 ),
               ),

@@ -32,7 +32,9 @@ class HomeScreen extends StatelessWidget {
         },
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [color.withOpacity(0.8), color]),
+            gradient: LinearGradient(
+              colors: [color.withOpacity(0.8), color],
+            ),
             borderRadius: BorderRadius.circular(20),
           ),
           padding: const EdgeInsets.all(18),
@@ -75,22 +77,19 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget buildHeader() {
-    return const Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Choose your level to start learning",
-            style: TextStyle(color: Colors.grey),
-          ),
-        ],
+  Widget buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Text(
+        "Choose your level to start learning",
+        style: TextStyle(
+          color: Theme.of(context).textTheme.bodyMedium?.color,
+        ),
       ),
     );
   }
 
-  // 🔥 Drawer Widget
+  // 🌙 Drawer with Night Mode
   Widget buildDrawer(BuildContext context) {
     return Drawer(
       child: Column(
@@ -108,9 +107,7 @@ class HomeScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.home),
             title: const Text("Home"),
-            onTap: () {
-              Navigator.pop(context);
-            },
+            onTap: () => Navigator.pop(context),
           ),
 
           ListTile(
@@ -129,6 +126,7 @@ class HomeScreen extends StatelessWidget {
             },
           ),
 
+          // 🌙 Night Mode Switch
           SwitchListTile(
             secondary: const Icon(Icons.dark_mode),
             title: const Text("Night Mode"),
@@ -148,7 +146,9 @@ class HomeScreen extends StatelessWidget {
                 context: context,
                 applicationName: "Learn English",
                 applicationVersion: "1.0.0",
-                children: const [Text("Simple English learning quiz app.")],
+                children: const [
+                  Text("Simple English learning quiz app."),
+                ],
               );
             },
           ),
@@ -160,15 +160,21 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: buildDrawer(context), // ✅ ADD HERE
+      drawer: buildDrawer(context),
 
-      appBar: AppBar(title: const Text("Learn English"), centerTitle: true),
+      appBar: AppBar(
+        title: const Text("Learn English"),
+        centerTitle: true,
+      ),
 
-      backgroundColor: Colors.grey[100],
+      // 🎨 Dynamic background
+      backgroundColor: isDarkMode
+          ? const Color(0xFF0D1117)
+          : Colors.grey[100],
 
       body: ListView(
         children: [
-          buildHeader(),
+          buildHeader(context),
 
           buildLevelCard(
             context: context,

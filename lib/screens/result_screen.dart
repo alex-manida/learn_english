@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final int score;
@@ -27,28 +26,28 @@ class ResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double percent = (score / total) * 100;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // 🏆 Title
-              const Text(
+              Text(
                 "Quiz Completed 🎉",
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: theme.textTheme.bodyLarge?.color,
                 ),
               ),
 
               const SizedBox(height: 30),
 
-              // 🔵 Circular Score
+              // 🔵 Score Circle
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -58,7 +57,7 @@ class ResultScreen extends StatelessWidget {
                     child: CircularProgressIndicator(
                       value: percent / 100,
                       strokeWidth: 12,
-                      backgroundColor: Colors.grey.shade800,
+                      backgroundColor: theme.dividerColor,
                       valueColor:
                       AlwaysStoppedAnimation(getColor(percent)),
                     ),
@@ -67,15 +66,19 @@ class ResultScreen extends StatelessWidget {
                     children: [
                       Text(
                         "${percent.toStringAsFixed(0)}%",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color:
+                          theme.textTheme.bodyLarge?.color,
                         ),
                       ),
                       Text(
                         "$score / $total",
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyle(
+                          color:
+                          theme.textTheme.bodyMedium?.color,
+                        ),
                       ),
                     ],
                   )
@@ -84,7 +87,6 @@ class ResultScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // 💬 Message
               Text(
                 getMessage(percent),
                 style: TextStyle(
@@ -96,19 +98,12 @@ class ResultScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // 🔁 Retry Button
+              // 🔁 Retry
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    padding: const EdgeInsets.all(16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
                   onPressed: () {
-                    Navigator.pop(context); // go back to quiz
+                    Navigator.pop(context);
                   },
                   child: const Text("Try Again"),
                 ),
@@ -116,35 +111,15 @@ class ResultScreen extends StatelessWidget {
 
               const SizedBox(height: 15),
 
-              // 🏠 Home Button
+              // 🏠 Home
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.orange),
-                    padding: const EdgeInsets.all(16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => HomeScreen(
-                          isDarkMode:
-                          Theme.of(context).brightness ==
-                              Brightness.dark,
-                          onThemeChanged: (value) {},
-                        ),
-                      ),
-                          (route) => false,
-                    );
+                    Navigator.popUntil(
+                        context, (route) => route.isFirst);
                   },
-                  child: const Text(
-                    "Back to Home",
-                    style: TextStyle(color: Colors.orange),
-                  ),
+                  child: const Text("Back to Home"),
                 ),
               ),
             ],
