@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learn_english/screens/about_screen.dart';
 import 'package:learn_english/screens/settings_screen.dart';
 import 'quiz_screen.dart';
 
@@ -59,40 +60,45 @@ class HomeScreen extends StatelessWidget {
           MaterialPageRoute(builder: (_) => QuizScreen(level: level)),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [color.withOpacity(0.8), color]),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.white,
-              child: Icon(icon, color: color, size: 30),
-            ),
-            const SizedBox(height: 12),
-
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+      child: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [color.withOpacity(0.8), color]),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.white,
+                child: Icon(icon, color: color, size: 30),
               ),
-            ),
+              const SizedBox(height: 12),
 
-            const SizedBox(height: 6),
-
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: Colors.white70),
-            ),
-          ],
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
+                children: [
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 12, color: Colors.white70),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -125,22 +131,22 @@ class HomeScreen extends StatelessWidget {
             title: const Text("Home"),
             onTap: () => Navigator.pop(context),
           ),
-
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text("Settings"),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => SettingsScreen(
-                    isDarkMode: isDarkMode,
-                    onThemeChanged: onThemeChanged,
-                  ),
-                ),
-              );
-            },
-          ),
+          //
+          // ListTile(
+          //   leading: const Icon(Icons.settings),
+          //   title: const Text("Settings"),
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (_) => SettingsScreen(
+          //           isDarkMode: isDarkMode,
+          //           onThemeChanged: onThemeChanged,
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // ),
 
           // 🌙 Night Mode Switch
           SwitchListTile(
@@ -158,11 +164,14 @@ class HomeScreen extends StatelessWidget {
             leading: const Icon(Icons.info),
             title: const Text("About"),
             onTap: () {
-              showAboutDialog(
-                context: context,
-                applicationName: "Learn English",
-                applicationVersion: "1.0.0",
-                children: const [Text("Simple English learning quiz app.")],
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AboutScreen(
+                    isDarkMode: isDarkMode,
+                    onThemeChanged: onThemeChanged,
+                  ),
+                ),
               );
             },
           ),
@@ -184,10 +193,9 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
 
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 300, // max width per card
-          mainAxisExtent: 180, // height of each card
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+          maxCrossAxisExtent: 500, // max width per card
+          mainAxisExtent: 100, // height of each card
+          crossAxisSpacing: 10, // spacing for ending and starting
         ),
 
         itemCount: levels.length,

@@ -18,7 +18,7 @@ Designed to help learners improve grammar through **level-based quizzes**, clean
 
 ## 📱 Screenshots
 
-> *(Add your app screenshots here)*
+> **
 
 ---
 

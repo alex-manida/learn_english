@@ -121,7 +121,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         color: theme.iconTheme.color),
                   ),
                   Text(
-                    "Module 1",
+                    "Exercise 01-20",
                     style: TextStyle(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.bold,
