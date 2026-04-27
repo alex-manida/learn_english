@@ -11,8 +11,15 @@ import 'dart:async';
 
 class QuizScreen extends StatefulWidget {
   final String level;
+  final int start;
+  final int end;
 
-  const QuizScreen({super.key, required this.level});
+  const QuizScreen({
+    super.key,
+    required this.level,
+    required this.start,
+    required this.end,
+  });
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -21,46 +28,62 @@ class QuizScreen extends StatefulWidget {
 class _QuizScreenState extends State<QuizScreen> {
   late List<Question> questions;
 
-  int index = 0;
-  int score = 0;
-  int? selectedIndex;
+  int index = 0;          // current question index
+  int score = 0;          // total correct answers
+  int? selectedIndex;     // selected answer
 
-  int timeLeft = 60;
+  int timeLeft = 60;      // countdown timer
   Timer? timer;
 
   @override
   void initState() {
     super.initState();
 
+    List<Question> allQuestions;
+
+    // 🔹 Load questions based on level
     if (widget.level == "elementary1") {
-      questions = e1Q;
+      allQuestions = e1Q;
     } else if (widget.level == "elementary2") {
-      questions = e2Q;
+      allQuestions = e2Q;
     } else if (widget.level == "pre intermediate") {
-      questions = preQ;
+      allQuestions = preQ;
     } else {
-      questions = interQ;
+      allQuestions = interQ;
     }
 
-    startTimer();
+    // 🔥 Filter questions using selected exercise range
+    questions = allQuestions.sublist(
+      widget.start,
+      widget.end > allQuestions.length
+          ? allQuestions.length
+          : widget.end,
+    );
+
+    startTimer(); // start timer for first question
   }
 
   @override
   void dispose() {
-    timer?.cancel();
+    timer?.cancel(); // stop timer when leaving screen
     super.dispose();
   }
 
+  // 🔹 User selects an answer
   void selectAnswer(int i) {
     if (selectedIndex == null) {
       setState(() {
         selectedIndex = i;
       });
+
+      // 🔥 Auto go to next question after 1 second
+      Future.delayed(const Duration(seconds: 1), nextQuestion);
     }
   }
 
+  // 🔹 Start countdown timer
   void startTimer() {
-    timer?.cancel();
+    timer?.cancel(); // cancel previous timer
     timeLeft = 60;
 
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -70,30 +93,39 @@ class _QuizScreenState extends State<QuizScreen> {
         });
       } else {
         t.cancel();
-        nextQuestion();
+        nextQuestion(); // auto next if time is up
       }
     });
   }
 
+  // 🔹 Go to next question
   void nextQuestion() {
     timer?.cancel();
 
+    // check correct answer
     if (selectedIndex == questions[index].correctIndex) {
       score++;
     }
 
+    // move to next or finish
     if (index < questions.length - 1) {
       setState(() {
         index++;
         selectedIndex = null;
       });
-      startTimer();
+      startTimer(); // restart timer
     } else {
+      // 🔥 Quiz finished → go to result screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              ResultScreen(score: score, total: questions.length),
+          builder: (_) => ResultScreen(
+            score: score,
+            total: questions.length,
+            level: widget.level,   // 🔥 pass level
+            start: widget.start,   // 🔥 pass range
+            end: widget.end,
+          ),
         ),
       );
     }
@@ -101,8 +133,16 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var q = questions[index];
     final theme = Theme.of(context);
+
+    // 🔥 Safety check (avoid crash if empty)
+    if (questions.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text("No questions available")),
+      );
+    }
+
+    var q = questions[index];
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -111,22 +151,27 @@ class _QuizScreenState extends State<QuizScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // 🔹 Top Bar
+              // 🔹 TOP BAR
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // back button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(Icons.arrow_back,
                         color: theme.iconTheme.color),
                   ),
+
+                  // exercise title
                   Text(
-                    "Exercise 01-20",
+                    "Exercise ${widget.start + 1}-${widget.end}",
                     style: TextStyle(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+
+                  // timer
                   Row(
                     children: [
                       const Icon(Icons.timer, color: Colors.orange),
@@ -144,7 +189,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
               const SizedBox(height: 20),
 
-              // 🔹 Progress
+              // 🔹 PROGRESS TEXT
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -157,6 +202,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
               const SizedBox(height: 8),
 
+              // 🔹 PROGRESS BAR
               LinearProgressIndicator(
                 value: (index + 1) / questions.length,
                 color: theme.colorScheme.primary,
@@ -165,7 +211,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
               const SizedBox(height: 30),
 
-              // 🔹 Question
+              // 🔹 QUESTION TEXT
               Text(
                 q.question,
                 textAlign: TextAlign.center,
@@ -178,7 +224,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
               const SizedBox(height: 30),
 
-              // 🔹 Options
+              // 🔹 OPTIONS LIST
               Expanded(
                 child: ListView.builder(
                   itemCount: q.options.length,
@@ -195,7 +241,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 ),
               ),
 
-              // 🔹 Next Button
+              // 🔹 NEXT BUTTON (optional, since auto-next exists)
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

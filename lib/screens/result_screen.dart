@@ -1,129 +1,166 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'quiz_screen.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final int score;
   final int total;
+
+  final String level;
+  final int start;
+  final int end;
 
   const ResultScreen({
     super.key,
     required this.score,
     required this.total,
+    required this.level,
+    required this.start,
+    required this.end,
   });
 
-  String getMessage(double percent) {
-    if (percent >= 90) return "Excellent! 🔥";
-    if (percent >= 70) return "Great job! 💪";
-    if (percent >= 50) return "Good effort 👍";
-    return "Keep practicing 📚";
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  bool saved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    saveStarsOnce();
   }
 
-  Color getColor(double percent) {
-    if (percent >= 70) return Colors.green;
-    if (percent >= 50) return Colors.orange;
-    return Colors.red;
+  // ⭐ stars logic
+  int calculateStars(double percent) {
+    if (percent >= 80) return 3;
+    if (percent >= 50) return 2;
+    return 1;
   }
+
+  // 💾 save stars
+  Future<void> saveStarsOnce() async {
+    if (saved) return;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    double percent = (widget.score / widget.total) * 100;
+    int stars = calculateStars(percent);
+
+    String key =
+        "${widget.level}_${widget.start}_${widget.end}";
+
+    await prefs.setInt(key, stars);
+
+    saved = true;
+  }
+
+  double get percent =>
+      (widget.score / widget.total) * 100;
 
   @override
   Widget build(BuildContext context) {
-    double percent = (score / total) * 100;
-    final theme = Theme.of(context);
+    int stars = calculateStars(percent);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Quiz Completed 🎉",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: theme.textTheme.bodyLarge?.color,
+      appBar: AppBar(
+        title: const Text("Result"),
+        centerTitle: true,
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+            // 📊 SCORE
+            Text(
+              "Score: ${percent.toStringAsFixed(0)}%",
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ⭐ STARS
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                stars,
+                    (i) => const Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                  size: 40,
                 ),
               ),
+            ),
 
-              const SizedBox(height: 30),
+            const SizedBox(height: 40),
 
-              // 🔵 Score Circle
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 150,
-                    height: 150,
-                    child: CircularProgressIndicator(
-                      value: percent / 100,
-                      strokeWidth: 12,
-                      backgroundColor: theme.dividerColor,
-                      valueColor:
-                      AlwaysStoppedAnimation(getColor(percent)),
+            // 🔁 RETRY BUTTON
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text("Retry This Exercise"),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => QuizScreen(
+                        level: widget.level,
+                        start: widget.start,
+                        end: widget.end,
+                      ),
                     ),
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        "${percent.toStringAsFixed(0)}%",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color:
-                          theme.textTheme.bodyLarge?.color,
-                        ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            // ➡️ NEXT BUTTON
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text("Next Exercise"),
+                onPressed: () {
+                  int nextStart = widget.end;
+                  int nextEnd = widget.end + (widget.end - widget.start);
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => QuizScreen(
+                        level: widget.level,
+                        start: nextStart,
+                        end: nextEnd,
                       ),
-                      Text(
-                        "$score / $total",
-                        style: TextStyle(
-                          color:
-                          theme.textTheme.bodyMedium?.color,
-                        ),
-                      ),
-                    ],
-                  )
-                ],
+                    ),
+                  );
+                },
               ),
+            ),
 
-              const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
-              Text(
-                getMessage(percent),
-                style: TextStyle(
-                  fontSize: 20,
-                  color: getColor(percent),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // 🔁 Retry
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Try Again"),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // 🏠 Home
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.popUntil(
-                        context, (route) => route.isFirst);
-                  },
-                  child: const Text("Back to Home"),
-                ),
-              ),
-            ],
-          ),
+            // 🏠 BACK HOME
+            TextButton(
+              onPressed: () {
+                Navigator.popUntil(
+                  context,
+                      (route) => route.isFirst,
+                );
+              },
+              child: const Text("Back to Home"),
+            ),
+          ],
         ),
       ),
     );
