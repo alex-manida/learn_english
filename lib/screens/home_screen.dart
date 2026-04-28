@@ -53,8 +53,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // State variables for user data
-  String userName = "Venerable Mānida";
-  String userEmail = "manida.mongha@gmail.com";
+  String userName = "English Learner";
+  String userEmail = "learner@learnenglish.com";
   String? userImagePath; // Stores the local path to the custom photo
   bool saved = false;
 
@@ -63,25 +63,37 @@ class _HomeScreenState extends State<HomeScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            EditProfileScreen(currentName: userName, currentEmail: userEmail),
+        builder: (context) => EditProfileScreen(
+          currentName: userName,
+          currentEmail: userEmail,
+          currentImagePath: userImagePath, // ✅ ADD THIS
+        ),
       ),
     );
-
     Future<void> saveUserData() async {
-      if (saved) return;
-
       final prefs = await SharedPreferences.getInstance();
 
-      String name = userName;
-      String email = userEmail;
-      String? image = userImagePath;
+      // ✅ Save using FIXED keys
+      await prefs.setString('userName', userName);
+      await prefs.setString('userEmail', userEmail);
 
-      String key = "$name $email $image";
+      if (userImagePath != null) {
+        await prefs.setString('userImagePath', userImagePath!);
+      }
+    }
 
-      await prefs.setString(key, name);
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        userName = result['name'] ?? userName;
+        userEmail = result['email'] ?? userEmail;
 
-      saved = true;
+        // ✅ Prevent overwriting with null
+        if (result['imagePath'] != null) {
+          userImagePath = result['imagePath'];
+        }
+      });
+
+      await saveUserData(); // ✅ Save after update
     }
 
     // Update the state with name, email, and the new image path
@@ -92,6 +104,22 @@ class _HomeScreenState extends State<HomeScreen> {
         userImagePath = result['imagePath']; // Path returned from picker
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      userName = prefs.getString('userName') ?? userName;
+      userEmail = prefs.getString('userEmail') ?? userEmail;
+      userImagePath = prefs.getString('userImagePath');
+    });
   }
 
   @override
@@ -113,15 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
             child: Row(
               children: [
-                // Small welcome avatar
-                if (userImagePath != null)
-                  CircleAvatar(
-                    radius: 15,
-                    backgroundImage: FileImage(File(userImagePath!)),
-                  )
-                else
-                  const Icon(Icons.account_circle, color: Colors.grey),
-                const SizedBox(width: 8),
                 Text(
                   "Welcome back, $userName!",
                   style: TextStyle(

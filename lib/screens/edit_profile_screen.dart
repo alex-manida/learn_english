@@ -1,15 +1,17 @@
-import 'dart:io';
+import 'dart:io'; // For File
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String currentName;
   final String currentEmail;
+  final String? currentImagePath; // ✅ Pass current image
 
   const EditProfileScreen({
     super.key,
     required this.currentName,
     required this.currentEmail,
+    this.currentImagePath,
   });
 
   @override
@@ -19,27 +21,39 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
-  File? _selectedImage;
+
+  String defaultName = "English Learner";
+  String defaultEmail = "learner@learnenglish.com";
+
+  File? _selectedImage; // New selected image
 
   @override
   void initState() {
     super.initState();
+
+    // ✅ Initialize text fields with current data
     _nameController = TextEditingController(text: widget.currentName);
     _emailController = TextEditingController(text: widget.currentEmail);
+
+    // ✅ Load existing image if available
+    if (widget.currentImagePath != null) {
+      _selectedImage = File(widget.currentImagePath!);
+    }
   }
 
-  // Picking images works on PC by opening the native File Explorer
+  // ✅ Function to pick image from gallery
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
+    final picker = ImagePicker();
+
     try {
       final XFile? image = await picker.pickImage(
         source: ImageSource.gallery,
-        maxWidth: 1000, // Optional: Resize for performance
+        maxWidth: 1000, // Resize (better performance)
       );
 
       if (image != null) {
         setState(() {
-          _selectedImage = File(image.path);
+          _selectedImage = File(image.path); // Store file locally
         });
       }
     } catch (e) {
@@ -47,28 +61,72 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  // ✅ Save and return data to previous screen
+  void _saveProfile() {
+    Navigator.pop(context, {
+      'name': _nameController.text.trim().isEmpty
+          ? defaultName
+          : _nameController.text.trim(),
+
+      'email': _emailController.text.trim().isEmpty
+          ? defaultEmail
+          : _emailController.text.trim(),
+
+      'imagePath': _selectedImage?.path, // null = default avatar
+    });
+  }
+
+  void _resetProfile() {
+    setState(() {
+      // ✅ Reset text fields
+      _nameController.text = defaultName;
+      _emailController.text = defaultEmail;
+
+      // ✅ Remove selected image
+      _selectedImage = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Profile"), centerTitle: true),
+      appBar: AppBar(
+        title: const Text("Edit Profile"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh), // 🔄 reset icon
+            tooltip: "Reset Profile",
+            onPressed: _resetProfile,
+          ),
+        ],
+      ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
             child: Column(
               children: [
-                // Profile Photo Stack
+                /// -------------------------------
+                /// PROFILE IMAGE
+                /// -------------------------------
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
                     CircleAvatar(
                       radius: 65,
                       backgroundColor: Colors.blue.withOpacity(0.1),
-                      backgroundImage: _selectedImage != null
+
+                      // ✅ Show selected or existing image
+                      backgroundImage:
+                          (_selectedImage != null &&
+                              _selectedImage!.existsSync())
                           ? FileImage(_selectedImage!)
                           : null,
-                      child: _selectedImage == null
+
+                      // ✅ Show icon if no image
+                      child: (_selectedImage == null)
                           ? const Icon(
                               Icons.person,
                               size: 70,
@@ -76,16 +134,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             )
                           : null,
                     ),
-                    // Edit button for photo
+
+                    /// Camera button
                     Material(
-                      elevation: 4,
                       shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAlias,
                       color: Theme.of(context).primaryColor,
+                      elevation: 4,
                       child: InkWell(
                         onTap: _pickImage,
                         child: const Padding(
-                          padding: EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8),
                           child: Icon(
                             Icons.camera_alt,
                             size: 20,
@@ -96,9 +154,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 40),
 
-                // Form Fields
+                /// -------------------------------
+                /// NAME FIELD
+                /// -------------------------------
                 TextField(
                   controller: _nameController,
                   decoration: const InputDecoration(
@@ -107,7 +168,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
+
                 const SizedBox(height: 20),
+
+                /// -------------------------------
+                /// EMAIL FIELD
+                /// -------------------------------
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
@@ -116,27 +182,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
+
                 const SizedBox(height: 40),
 
-                // Action Buttons
+                /// -------------------------------
+                /// SAVE BUTTON
+                /// -------------------------------
                 SizedBox(
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
+                    onPressed: _saveProfile,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context, {
-                        'name': _nameController.text,
-                        'email': _emailController.text,
-                        'imagePath': _selectedImage?.path,
-                      });
-                    },
                     child: const Text(
                       "SAVE CHANGES",
                       style: TextStyle(fontWeight: FontWeight.bold),
