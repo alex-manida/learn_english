@@ -161,9 +161,10 @@ class AboutScreen extends StatelessWidget {
                             _launchUrl("https://www.facebook.com/kara.archu"),
                       ),
                       _buildConnectItem(
-                        icon: Icons.send,
-                        label: "Telegram",
-                        onTap: () => _launchUrl("https://t.me/Inferno_baby"),
+                        icon: Icons.camera_alt,
+                        label: "Instagram",
+                        onTap: () =>
+                            _launchUrl("https://instagram.com/kara_archu"),
                       ),
                       _buildConnectItem(
                         icon: Icons.send,
