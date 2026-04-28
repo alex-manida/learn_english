@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
   final bool isDarkMode;
@@ -10,6 +11,36 @@ class AboutScreen extends StatelessWidget {
     required this.isDarkMode,
     required this.onThemeChanged,
   });
+
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Widget _buildConnectItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 22),
+            const SizedBox(width: 8),
+            Text(label),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,12 +123,71 @@ class AboutScreen extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [],
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 10, // space horizontally
+                    runSpacing: 10, // space vertically when wrapped
+                    children: [
+                      _buildConnectItem(
+                        icon: Icons.phone,
+                        label: "Phone",
+                        onTap: () => _launchUrl("tel:+959454402739"),
+                      ),
+                      _buildConnectItem(
+                        icon: Icons.email,
+                        label: "Email",
+                        onTap: () {
+                          final subject = Uri.encodeComponent(
+                            "Hello from your app",
+                          );
+                          final body = Uri.encodeComponent(
+                            "Hi, I would like to connect with you.",
+                          );
+
+                          _launchUrl(
+                            "mailto:artificialmgphone@gmail.com?subject=$subject&body=$body",
+                          );
+                        },
+                      ),
+                      _buildConnectItem(
+                        icon: Icons.facebook,
+                        label: "Facebook",
+                        onTap: () =>
+                            _launchUrl("https://www.facebook.com/kara.archu"),
+                      ),
+                      _buildConnectItem(
+                        icon: Icons.send,
+                        label: "Telegram",
+                        onTap: () => _launchUrl("https://t.me/Inferno_baby"),
+                      ),
+                      _buildConnectItem(
+                        icon: Icons.send,
+                        label: "Telegram",
+                        onTap: () {
+                          final message = Uri.encodeComponent(
+                            "Hello, I found your app!",
+                          );
+
+                          _launchUrl("https://t.me/Inferno_baby?text=$message");
+                        },
+                      ),
+                      _buildConnectItem(
+                        icon: Icons.message,
+                        label: "WhatsApp",
+                        onTap: () {
+                          final message = Uri.encodeComponent(
+                            "Hello, I want to connect with you!",
+                          );
+
+                          _launchUrl(
+                            "https://wa.me/959454402739?text=$message",
+                          );
+                        },
+                      ),
+                    ],
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 70),
 
                   // Footer
                   Text(
