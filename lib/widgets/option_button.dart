@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class OptionButton extends StatelessWidget {
   final String text;
   final int index;
@@ -55,10 +56,7 @@ class OptionButton extends StatelessWidget {
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
           ],

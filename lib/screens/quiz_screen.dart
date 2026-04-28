@@ -28,11 +28,11 @@ class QuizScreen extends StatefulWidget {
 class _QuizScreenState extends State<QuizScreen> {
   late List<Question> questions;
 
-  int index = 0;          // current question index
-  int score = 0;          // total correct answers
-  int? selectedIndex;     // selected answer
+  int index = 0; // current question index
+  int score = 0; // total correct answers
+  int? selectedIndex; // selected answer
 
-  int timeLeft = 60;      // countdown timer
+  int timeLeft = 60; // countdown timer
   Timer? timer;
 
   @override
@@ -55,9 +55,7 @@ class _QuizScreenState extends State<QuizScreen> {
     // 🔥 Filter questions using selected exercise range
     questions = allQuestions.sublist(
       widget.start,
-      widget.end > allQuestions.length
-          ? allQuestions.length
-          : widget.end,
+      widget.end > allQuestions.length ? allQuestions.length : widget.end,
     );
 
     startTimer(); // start timer for first question
@@ -122,8 +120,10 @@ class _QuizScreenState extends State<QuizScreen> {
           builder: (_) => ResultScreen(
             score: score,
             total: questions.length,
-            level: widget.level,   // 🔥 pass level
-            start: widget.start,   // 🔥 pass range
+            level: widget.level,
+            // 🔥 pass level
+            start: widget.start,
+            // 🔥 pass range
             end: widget.end,
           ),
         ),
@@ -158,8 +158,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   // back button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.arrow_back,
-                        color: theme.iconTheme.color),
+                    icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
                   ),
 
                   // exercise title
@@ -194,9 +193,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Question ${index + 1} of ${questions.length}",
-                  style: TextStyle(
-                    color: theme.colorScheme.primary,
-                  ),
+                  style: TextStyle(color: theme.colorScheme.primary),
                 ),
               ),
 
@@ -245,8 +242,7 @@ class _QuizScreenState extends State<QuizScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed:
-                  selectedIndex == null ? null : nextQuestion,
+                  onPressed: selectedIndex == null ? null : nextQuestion,
                   child: const Text("Next Question"),
                 ),
               ),

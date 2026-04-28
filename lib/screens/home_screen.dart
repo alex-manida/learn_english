@@ -2,6 +2,7 @@ import 'dart:io'; // Needed for FileImage
 import 'package:flutter/material.dart';
 import 'package:learn_english/screens/about_screen.dart';
 import 'package:learn_english/screens/edit_profile_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'quiz_screen.dart';
 import 'exercise_screen.dart';
 
@@ -55,18 +56,33 @@ class _HomeScreenState extends State<HomeScreen> {
   String userName = "Venerable Mānida";
   String userEmail = "manida.mongha@gmail.com";
   String? userImagePath; // Stores the local path to the custom photo
+  bool saved = false;
 
   // Function to handle navigation and data return from Edit Screen
   Future<void> _navigateToEditProfile() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditProfileScreen(
-          currentName: userName,
-          currentEmail: userEmail,
-        ),
+        builder: (context) =>
+            EditProfileScreen(currentName: userName, currentEmail: userEmail),
       ),
     );
+
+    Future<void> saveUserData() async {
+      if (saved) return;
+
+      final prefs = await SharedPreferences.getInstance();
+
+      String name = userName;
+      String email = userEmail;
+      String? image = userImagePath;
+
+      String key = "$name $email $image";
+
+      await prefs.setString(key, name);
+
+      saved = true;
+    }
 
     // Update the state with name, email, and the new image path
     if (result != null && result is Map<String, dynamic>) {
@@ -87,7 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         elevation: 0,
       ),
-      backgroundColor: widget.isDarkMode ? const Color(0xFF0D1117) : Colors.grey[100],
+      backgroundColor: widget.isDarkMode
+          ? const Color(0xFF0D1117)
+          : Colors.grey[100],
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -192,7 +210,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   Text(
                     subtitle,
@@ -203,7 +225,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white54,
+              size: 16,
+            ),
           ],
         ),
       ),
@@ -218,10 +244,17 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.only(top: 60, bottom: 30, left: 20, right: 20),
+            padding: const EdgeInsets.only(
+              top: 60,
+              bottom: 30,
+              left: 20,
+              right: 20,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.primary,
-              borderRadius: const BorderRadius.only(bottomRight: Radius.circular(30)),
+              borderRadius: const BorderRadius.only(
+                bottomRight: Radius.circular(30),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,7 +269,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? FileImage(File(userImagePath!))
                           : null,
                       child: userImagePath == null
-                          ? Icon(Icons.person, size: 40, color: colorScheme.primary)
+                          ? Icon(
+                              Icons.person,
+                              size: 40,
+                              color: colorScheme.primary,
+                            )
                           : null,
                     ),
                     Positioned(
@@ -246,8 +283,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: _navigateToEditProfile,
                         child: Container(
                           padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                          child: Icon(Icons.edit, size: 14, color: colorScheme.primary),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            size: 14,
+                            color: colorScheme.primary,
+                          ),
                         ),
                       ),
                     ),
@@ -256,11 +300,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 15),
                 Text(
                   userName,
-                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
                   userEmail,
-                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
@@ -308,10 +359,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _drawerItem({required IconData icon, required String text, required VoidCallback onTap}) {
+  Widget _drawerItem({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+  }) {
     return ListTile(
       leading: Icon(icon, color: Colors.blueGrey),
-      title: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+      title: Text(
+        text,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      ),
       onTap: onTap,
     );
   }

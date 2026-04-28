@@ -48,40 +48,31 @@ class _ResultScreenState extends State<ResultScreen> {
     double percent = (widget.score / widget.total) * 100;
     int stars = calculateStars(percent);
 
-    String key =
-        "${widget.level}_${widget.start}_${widget.end}";
+    String key = "${widget.level}_${widget.start}_${widget.end}";
 
     await prefs.setInt(key, stars);
 
     saved = true;
   }
 
-  double get percent =>
-      (widget.score / widget.total) * 100;
+  double get percent => (widget.score / widget.total) * 100;
 
   @override
   Widget build(BuildContext context) {
     int stars = calculateStars(percent);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Result"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("Result"), centerTitle: true),
 
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
             // 📊 SCORE
             Text(
               "Score: ${percent.toStringAsFixed(0)}%",
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 20),
@@ -91,11 +82,7 @@ class _ResultScreenState extends State<ResultScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 stars,
-                    (i) => const Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                  size: 40,
-                ),
+                (i) => const Icon(Icons.star, color: Colors.amber, size: 40),
               ),
             ),
 
@@ -153,10 +140,7 @@ class _ResultScreenState extends State<ResultScreen> {
             // 🏠 BACK HOME
             TextButton(
               onPressed: () {
-                Navigator.popUntil(
-                  context,
-                      (route) => route.isFirst,
-                );
+                Navigator.popUntil(context, (route) => route.isFirst);
               },
               child: const Text("Back to Home"),
             ),

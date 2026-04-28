@@ -94,8 +94,7 @@ class AboutScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                    ],
+                    children: [],
                   ),
 
                   const SizedBox(height: 40),

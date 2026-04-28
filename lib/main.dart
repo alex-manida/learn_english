@@ -38,9 +38,7 @@ class _MyAppState extends State<MyApp> {
           centerTitle: true,
         ),
 
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Colors.black),
-        ),
+        textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.black)),
 
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -61,9 +59,7 @@ class _MyAppState extends State<MyApp> {
           centerTitle: true,
         ),
 
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Colors.white),
-        ),
+        textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
 
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -75,10 +71,7 @@ class _MyAppState extends State<MyApp> {
 
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
 
-      home: HomeScreen(
-        isDarkMode: isDarkMode,
-        onThemeChanged: toggleTheme,
-      ),
+      home: HomeScreen(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
     );
   }
 }

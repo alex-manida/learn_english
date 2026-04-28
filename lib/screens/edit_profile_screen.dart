@@ -50,10 +50,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Edit Profile"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("Edit Profile"), centerTitle: true),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -72,7 +69,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ? FileImage(_selectedImage!)
                           : null,
                       child: _selectedImage == null
-                          ? const Icon(Icons.person, size: 70, color: Colors.blue)
+                          ? const Icon(
+                              Icons.person,
+                              size: 70,
+                              color: Colors.blue,
+                            )
                           : null,
                     ),
                     // Edit button for photo
@@ -85,7 +86,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         onTap: _pickImage,
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                          child: Icon(
+                            Icons.camera_alt,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -121,7 +126,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {
                       Navigator.pop(context, {
@@ -130,7 +137,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         'imagePath': _selectedImage?.path,
                       });
                     },
-                    child: const Text("SAVE CHANGES", style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      "SAVE CHANGES",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],
