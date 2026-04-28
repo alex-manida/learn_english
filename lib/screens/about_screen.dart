@@ -100,7 +100,9 @@ class AboutScreen extends StatelessWidget {
                     context,
                     title: "About App",
                     content:
-                        "Improve your English skills through interactive quizzes and structured lessons. Designed to help learners at every level achieve fluency.",
+                        "A quiz-based English learning app designed for all levels of learners.\n\n"
+                        "Practice grammar, vocabulary, and sentence understanding through interactive tests.\n\n"
+                        "Learn anytime, anywhere with a simple and focused learning experience.",
                     icon: Icons.info_outline_rounded,
                   ),
 
@@ -111,7 +113,10 @@ class AboutScreen extends StatelessWidget {
                     context,
                     title: "The Developer",
                     content:
-                        "Developed by Venerable Mānida.\nA passionate developer dedicated to creating accessible educational tools for the community.",
+                        "Developed by Venerable Mānida.\n\n"
+                        "I live in Mong Ha, Mong Yai, Tangyan Township, Northern Shan State, Myanmar.\n\n"
+                        "I am currently studying at LMS School to improve my English skills. In mid-2025, I joined Batch 15 where I had the opportunity to learn Java programming.\n\n"
+                        "Now, as part of Batch 16, I am continuing my journey by learning Android and Flutter development. This application is one of the projects I have built during my learning process.",
                     icon: Icons.code_rounded,
                   ),
 
