@@ -75,7 +75,7 @@ class _QuizScreenState extends State<QuizScreen> {
       });
 
       // 🔥 Auto go to next question after 1 second
-      Future.delayed(const Duration(seconds: 1), nextQuestion);
+      // Future.delayed(const Duration(seconds: 1), nextQuestion);
     }
   }
 
