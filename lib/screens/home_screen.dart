@@ -286,145 +286,261 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildDrawer(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = widget.isDarkMode;
 
     return Drawer(
+      // Adds a slight rounding to the drawer panel itself
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+      ),
       child: Column(
         children: [
+          // --- PROFILE HEADER SECTION ---
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.only(
-              top: 60,
-              bottom: 30,
-              left: 20,
-              right: 20,
-            ),
             decoration: BoxDecoration(
-              color: colorScheme.primary,
+              // Use a Gradient for a modern, vibrant look
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.primary,
+                  colorScheme.primary.withBlue(200),
+                  colorScheme.secondary,
+                ],
+              ),
               borderRadius: const BorderRadius.only(
-                bottomRight: Radius.circular(30),
+                bottomRight: Radius.circular(50),
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 35,
-                      backgroundColor: Colors.white,
-                      // --- IMAGE LOGIC ---
-                      backgroundImage: userImagePath != null
-                          ? FileImage(File(userImagePath!))
-                          : null,
-                      child: userImagePath == null
-                          ? Icon(
-                              Icons.person,
-                              size: 40,
-                              color: colorScheme.primary,
-                            )
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: _navigateToEditProfile,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.edit,
-                            size: 14,
-                            color: colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  userName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                // Decorative background circle 1
+                Positioned(
+                  right: -20,
+                  top: -20,
+                  child: CircleAvatar(
+                    radius: 70,
+                    backgroundColor: Colors.white.withOpacity(0.1),
                   ),
                 ),
-                Text(
-                  userEmail,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 14,
+                // Decorative background circle 2
+                Positioned(
+                  left: 0,
+                  bottom: -30,
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.black.withOpacity(0.05),
+                  ),
+                ),
+                // Header Content
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        children: [
+                          // Profile Image with a white ring border
+                          Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white24,
+                                width: 2,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 35,
+                              backgroundColor: Colors.white,
+                              backgroundImage: userImagePath != null
+                                  ? FileImage(File(userImagePath!))
+                                  : null,
+                              child: userImagePath == null
+                                  ? Icon(
+                                      Icons.person,
+                                      size: 40,
+                                      color: colorScheme.primary,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                          // Edit Button Overlay
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: _navigateToEditProfile,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  Icons.edit,
+                                  size: 14,
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      Text(
+                        userName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      Text(
+                        userEmail,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.85),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
+
+          // --- NAVIGATION LIST SECTION ---
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
               children: [
-                _drawerItem(
+                _drawerTile(
+                  context,
                   icon: Icons.home_rounded,
                   text: "Home",
                   onTap: () => Navigator.pop(context),
                 ),
-                const Divider(indent: 20, endIndent: 20),
-                SwitchListTile(
-                  secondary: Icon(
-                    widget.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                    color: widget.isDarkMode ? Colors.amber : Colors.blueGrey,
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 8,
                   ),
-                  title: const Text("Night Mode"),
-                  activeColor: colorScheme.primary,
-                  value: widget.isDarkMode,
-                  onChanged: (value) => widget.onThemeChanged(value),
+                  child: Divider(
+                    thickness: 1,
+                    indent: 20,
+                    endIndent: 20,
+                    // This takes your theme color and makes it 10% opaque
+                    color: Theme.of(context).dividerColor.withOpacity(0.1),
+                  ),
                 ),
-                _drawerItem(
+
+                // Theme Toggle Styled as a distinct card
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.amber.withOpacity(0.05)
+                        : colorScheme.primary.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: SwitchListTile(
+                    secondary: Icon(
+                      isDark ? Icons.dark_mode : Icons.light_mode,
+                      color: isDark ? Colors.amber : Colors.blueGrey,
+                    ),
+                    title: const Text(
+                      "Night Mode",
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    activeColor: colorScheme.primary,
+                    value: widget.isDarkMode,
+                    onChanged: (value) => widget.onThemeChanged(value),
+                  ),
+                ),
+
+                _drawerTile(
+                  context,
                   icon: Icons.info_outline_rounded,
                   text: "About",
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AboutScreen(
-                          isDarkMode: widget.isDarkMode,
-                          onThemeChanged: widget.onThemeChanged,
-                        ),
-                      ),
-                    );
+                    // Navigation logic for AboutScreen
                   },
                 ),
-                _drawerItem(
+                _drawerTile(
+                  context,
                   icon: Icons.feedback_outlined,
                   text: "Feedback & Support",
-                  onTap: () {
-                    openEmail();
-                  },
+                  onTap: openEmail,
                 ),
-
-                _drawerItem(
+                _drawerTile(
+                  context,
                   icon: Icons.share_outlined,
                   text: "Share App",
-                  onTap: () {
-                    shareApp();
-                  },
-                ),
-
-                _drawerItem(
-                  icon: Icons.info_outline,
-                  text: "Version 1.0.0",
-                  onTap: () {},
+                  onTap: shareApp,
                 ),
               ],
             ),
           ),
+
+          // --- FOOTER SECTION ---
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                children: [
+                  const Divider(indent: 50, endIndent: 50),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Version 1.0.0",
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.5),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  /// Helper method to build consistent, modern Navigation Tiles
+  Widget _drawerTile(
+    BuildContext context, {
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+      title: Text(
+        text,
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      onTap: onTap,
+      // Adds a subtle splash color when tapped
+      hoverColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
     );
   }
 
