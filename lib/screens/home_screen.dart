@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:learn_english/screens/about_screen.dart';
 import 'package:learn_english/screens/edit_profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'quiz_screen.dart';
 import 'exercise_screen.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
 
 final List<Map<String, dynamic>> levels = [
   {
@@ -106,10 +109,24 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  String appVersion = "";
+
+  void shareApp() {
+    Share.share("Check out this Learn English app! 🚀\nDownload now!");
+  }
+
   @override
   void initState() {
     super.initState();
     loadUserData();
+    loadVersion();
+  }
+
+  Future<void> loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = info.version;
+    });
   }
 
   Future<void> loadUserData() async {
@@ -120,6 +137,18 @@ class _HomeScreenState extends State<HomeScreen> {
       userEmail = prefs.getString('userEmail') ?? userEmail;
       userImagePath = prefs.getString('userImagePath');
     });
+  }
+
+  Future<void> openEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'artificialmgphone@gmail.com',
+      query: 'subject=App Feedback',
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    }
   }
 
   @override
@@ -369,6 +398,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   },
+                ),
+                _drawerItem(
+                  icon: Icons.feedback_outlined,
+                  text: "Feedback & Support",
+                  onTap: () {
+                    openEmail();
+                  },
+                ),
+
+                _drawerItem(
+                  icon: Icons.share_outlined,
+                  text: "Share App",
+                  onTap: () {
+                    shareApp();
+                  },
+                ),
+
+                _drawerItem(
+                  icon: Icons.info_outline,
+                  text: "Version 1.0.0",
+                  onTap: () {},
                 ),
               ],
             ),

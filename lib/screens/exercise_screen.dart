@@ -12,7 +12,7 @@ class ExerciseScreen extends StatefulWidget {
 }
 
 class _ExerciseScreenState extends State<ExerciseScreen> {
-  final int totalQuestions = 150;
+  final int totalQuestions = 500;
   final int chunkSize = 10;
 
   List<Map<String, int>> ranges = [];
@@ -47,18 +47,13 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
       final start = r["start"]!;
       final end = r["end"]!;
 
-      String key = "${widget.level}_${start}_${end}";
+      String key = "${widget.level}_${start}_$end";
       temp[key] = prefs.getInt(key) ?? 0;
-
-      // 🔍 DEBUG (optional)
-      print("KEY: $key -> ${temp[key]}");
     }
 
     setState(() {
       starsMap = temp;
     });
-
-    print("FINAL MAP: $starsMap");
   }
 
   // 🔒 Unlock logic
