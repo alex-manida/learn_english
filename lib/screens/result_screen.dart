@@ -23,23 +23,46 @@ class ResultScreen extends StatefulWidget {
   State<ResultScreen> createState() => _ResultScreenState();
 }
 
-class _ResultScreenState extends State<ResultScreen> {
+class _ResultScreenState extends State<ResultScreen>
+    with SingleTickerProviderStateMixin {
   bool saved = false;
+
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
+
     saveStarsOnce();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.elasticOut,
+    );
+
+    _controller.forward();
   }
 
-  // ⭐ stars logic
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  // ⭐ Calculate stars
   int calculateStars(double percent) {
     if (percent >= 80) return 3;
     if (percent >= 50) return 2;
     return 1;
   }
 
-  // 💾 save stars
+  // 💾 Save stars
   Future<void> saveStarsOnce() async {
     if (saved) return;
 
@@ -57,94 +80,227 @@ class _ResultScreenState extends State<ResultScreen> {
 
   double get percent => (widget.score / widget.total) * 100;
 
+  String get message {
+    if (percent >= 80) return "Excellent Work! 🎉";
+    if (percent >= 50) return "Good Job! 👍";
+    return "Keep Practicing 💪";
+  }
+
+  Color get resultColor {
+    if (percent >= 80) return Colors.green;
+    if (percent >= 50) return Colors.orange;
+    return Colors.redAccent;
+  }
+
   @override
   Widget build(BuildContext context) {
     int stars = calculateStars(percent);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Result"), centerTitle: true),
+      backgroundColor: const Color(0xFFF5F7FB),
 
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 📊 SCORE
-            Text(
-              "Score: ${percent.toStringAsFixed(0)}%",
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const Spacer(),
 
-            const SizedBox(height: 20),
-
-            // ⭐ STARS
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                stars,
-                (i) => const Icon(Icons.star, color: Colors.amber, size: 40),
-              ),
-            ),
-
-            const SizedBox(height: 40),
-
-            // 🔁 RETRY BUTTON
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.refresh),
-                label: const Text("Retry This Exercise"),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => QuizScreen(
-                        level: widget.level,
-                        start: widget.start,
-                        end: widget.end,
+              // 🏆 Result Card
+              ScaleTransition(
+                scale: _scaleAnimation,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            // ➡️ NEXT BUTTON
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.arrow_forward),
-                label: const Text("Next Exercise"),
-                onPressed: () {
-                  int nextStart = widget.end;
-                  int nextEnd = widget.end + (widget.end - widget.start);
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => QuizScreen(
-                        level: widget.level,
-                        start: nextStart,
-                        end: nextEnd,
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 45,
+                        backgroundColor: resultColor.withOpacity(0.15),
+                        child: Icon(
+                          Icons.emoji_events,
+                          color: resultColor,
+                          size: 50,
+                        ),
                       ),
-                    ),
-                  );
-                },
+
+                      const SizedBox(height: 20),
+
+                      Text(
+                        message,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Text(
+                        "You scored",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 16,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Text(
+                        "${percent.toStringAsFixed(0)}%",
+                        style: TextStyle(
+                          fontSize: 52,
+                          fontWeight: FontWeight.bold,
+                          color: resultColor,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Text(
+                        "${widget.score} / ${widget.total} Correct Answers",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // ⭐ Stars
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          3,
+                          (index) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Icon(
+                              index < stars
+                                  ? Icons.star_rounded
+                                  : Icons.star_border_rounded,
+                              color: Colors.amber,
+                              size: 42,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const Spacer(),
 
-            // 🏠 BACK HOME
-            TextButton(
-              onPressed: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-              child: const Text("Back to Home"),
-            ),
-          ],
+              // 🔁 Retry Button
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 350),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text(
+                        "Retry Exercise",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => QuizScreen(
+                              level: widget.level,
+                              start: widget.start,
+                              end: widget.end,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // ➡️ Next Button
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 350),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.arrow_forward_rounded),
+                      label: const Text(
+                        "Next Exercise",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      onPressed: () {
+                        int nextStart = widget.end;
+                        int nextEnd = widget.end + (widget.end - widget.start);
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => QuizScreen(
+                              level: widget.level,
+                              start: nextStart,
+                              end: nextEnd,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              // 🏠 Back Home
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                },
+                icon: const Icon(Icons.home_rounded),
+                label: const Text(
+                  "Back to Home",
+                  style: TextStyle(fontSize: 15),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+            ],
+          ),
         ),
       ),
     );

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.manida.learn_english"
+    namespace = "com.example.learn_english"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.manida.learn_english"
+        applicationId = "com.example.learn_english"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
