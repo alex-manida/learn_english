@@ -4,7 +4,6 @@ import 'package:learn_english/screens/about_screen.dart';
 import 'package:learn_english/screens/edit_profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'quiz_screen.dart';
 import 'exercise_screen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
@@ -476,7 +475,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.info_outline_rounded,
                   text: "About",
                   onTap: () {
-                    // Navigation logic for AboutScreen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AboutScreen(
+                          isDarkMode: widget.isDarkMode,
+                          onThemeChanged: widget.onThemeChanged,
+                        ),
+                      ),
+                    );
                   },
                 ),
                 _drawerTile(
