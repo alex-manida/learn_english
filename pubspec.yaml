@@ -67,7 +67,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/app_icon.png
+    - assets/images/windows_icon.png
+    - assets/images/android_icon.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -98,11 +99,11 @@ flutter:
 
 flutter_launcher_icons:
   android: "launcher_icon"
-  image_path: "assets/images/app_icon.png"
+  image_path: "assets/images/android_icon.png"
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/images/app_icon.png"
+  adaptive_icon_foreground: "assets/images/android_icon.png"
 
   windows:
     generate: true
-    image_path: "assets/images/app_icon.png"
+    image_path: "assets/images/windows_icon.png"
     icon_size: 48
