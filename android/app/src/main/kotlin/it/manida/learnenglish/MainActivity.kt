@@ -1,4 +1,4 @@
-package it.manida.learn_english
+package it.manida.learnenglish
 
 import io.flutter.embedding.android.FlutterActivity
 
