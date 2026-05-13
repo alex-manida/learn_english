@@ -134,11 +134,6 @@ class AboutScreen extends StatelessWidget {
                     runSpacing: 10, // space vertically when wrapped
                     children: [
                       _buildConnectItem(
-                        icon: Icons.phone,
-                        label: "Phone",
-                        onTap: () => _launchUrl("tel:+959454402739"),
-                      ),
-                      _buildConnectItem(
                         icon: Icons.email,
                         label: "Email",
                         onTap: () {
